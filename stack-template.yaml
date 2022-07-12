@@ -1,0 +1,64 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >
+  This template deploys a three tier CodePipeline
+
+# Parameters:
+  # GithubRepo:
+  #   Description: Gitub Repository name
+  #   Type: AWS::SSM::Parameter::Value<String>
+  #   Default: /service/demo-cicd-pipeline/github/repo
+
+  # GithubToken:
+  #   Description: Github OAuth Token with full permissions on admin:repo_hook and repo
+  #   Type: AWS::SSM::Parameter::Value<String>
+  #   NoEcho: true
+  #   Default: /service/demo-cicd-pipeline/github/token
+
+  # GithubUser:
+  #   Description: Github user where the repository lives
+  #   Type: AWS::SSM::Parameter::Value<String>
+  #   Default: /service/demo-cicd-pipeline/github/user
+
+Resources:
+  DeploymentBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: PublicRead
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: error.html
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+  BucketPolicy:
+    Type: 'AWS::S3::BucketPolicy'
+    Properties:
+      PolicyDocument:
+        Id: MyPolicy
+        Version: 2012-10-17
+        Statement:
+          - Sid: PublicReadForGetBucketObjects
+            Effect: Allow
+            Principal: '*'
+            Action: 's3:GetObject'
+            Resource: !Join 
+              - ''
+              - - 'arn:aws:s3:::'
+                - !Ref DeploymentBucket
+                - /*
+      Bucket: !Ref DeploymentBucket
+
+Outputs:
+  WebsiteURL:
+    Value: !GetAtt 
+      - DeploymentBucket
+      - WebsiteURL
+    Description: URL for website hosted on S3
+  S3BucketSecureURL:
+    Value: !Join 
+      - ''
+      - - 'https://'
+        - !GetAtt 
+          - DeploymentBucket
+          - DomainName
+    Description: Name of S3 bucket to hold website content
+
