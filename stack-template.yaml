@@ -2,25 +2,6 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: >
   This template deploys a three tier CodePipeline
 
-Metadata:
-  AWS::CloudFormation::Interface:
-    ParameterGroups:
-      - Label:
-          default: GitHub Configuration
-        Parameters:
-          - GitHubOwner
-          - GitHubRepo
-          - GitHubToken
-    ParameterLabels:
-      GitHubOwner:
-        default: Repo Owner
-      GitHubRepo:
-        default: Repo Name
-      GitHubToken:
-        default: Personal Access Token
-      BuildRegion:
-        default: AWS Build Region
-
 Parameters:
   GitHubOwner:
     Description: Owner of git repo to clone, for example JamesHarringtonDev
@@ -45,19 +26,19 @@ Resources:
   GitHubOwnerParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub /${ServiceName}/build/GITHUB_OWNER
+      Name: !Sub /${GitHubRepo}/build/GITHUB_OWNER
       Type: String
       Value: !Sub ${GitHubOwner}
   GitHubRepoParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub /${ServiceName}/build/GITHUB_REPO
+      Name: !Sub /${GitHubRepo}/build/GITHUB_REPO
       Type: String
       Value: !Sub ${GitHubRepo}
   GitHubTokenParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub /${ServiceName}/build/GITHUB_TOKEN
+      Name: !Sub /${GitHubRepo}/build/GITHUB_TOKEN
       Type: String
       Value: !Sub ${GitHubAccessToken}
 
@@ -166,6 +147,13 @@ Resources:
                 Action: s3:*Object
                 Resource:
                 - arn:aws:s3:::bucket-name/*
+              - Effect: Allow
+                Resource:
+                - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*'
+                Action:
+                - 'logs:CreateLogGroup'
+                - 'logs:CreateLogStream'
+                - 'logs:PutLogEvents'
 Outputs:
   WebsiteURL:
     Value: !GetAtt 
