@@ -1,1 +1,0 @@
-# node-codepipeline-codebuild-template
