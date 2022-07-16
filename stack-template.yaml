@@ -138,12 +138,12 @@ Resources:
                 Action:
                 - s3:ListBucket
                 Resource:
-                - arn:aws:s3:::bucket-name
+                - !Sub arn:aws:s3:::${StagingSiteBucket}
               - Sid: AllObjectActions
                 Effect: Allow
                 Action: s3:*Object
                 Resource:
-                - arn:aws:s3:::bucket-name/*
+                - !Sub arn:aws:s3:::${StagingSiteBucket}/*
               - Effect: Allow
                 Resource:
                 - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*'
