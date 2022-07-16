@@ -10,7 +10,7 @@ phases:
       - echo "Staging Bucket Name $SITE_BUCKET_NAME"
   pre_build:
     commands:     
-      - npm run test
+      - npm run test:unit
   build:
     commands:     
      - npm run build
