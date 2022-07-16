@@ -7,10 +7,11 @@ phases:
     commands:
       # Installing 
       - npm install
-      - echo "Staging Bucket Name $SITE_BUCKET_NAME"
   pre_build:
     commands:     
       - npm run test
   build:
     commands:     
      - npm run build
+     - aws s3 rm s3://$SITE_BUCKET_NAME --recursive
+     - aws s3 sync build s3://$SITE_BUCKET_NAME
