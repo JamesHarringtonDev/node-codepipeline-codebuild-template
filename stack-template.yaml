@@ -42,9 +42,6 @@ Resources:
       Type: String
       Value: !Sub ${GitHubAccessToken}
 
-
-
-
   StagingSiteBucket:
     Type: 'AWS::S3::Bucket'
     Properties:
@@ -100,8 +97,8 @@ Resources:
         ComputeType: BUILD_GENERAL1_SMALL
         Image: aws/codebuild/standard:4.0
         EnvironmentVariables:
-          - Name: MY_ENV_VAR
-            Value: something
+          - Name: SITE_BUCKET_NAME
+            Value: !Ref StagingSiteBucket
             Type: PLAINTEXT
       Source:
         Auth:
