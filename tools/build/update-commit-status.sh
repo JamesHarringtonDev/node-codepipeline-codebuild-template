@@ -22,6 +22,8 @@ command=$2
 echo "context=$context"
 echo "command=$command"
 
+echo "https://api.github.com/repos/$GitHubOwner/$GitHubRepo/statuses/$commit?access_token=$GithubToken"
+
 echo `hub api "https://api.github.com/repos/$GitHubOwner/$GitHubRepo/statuses/$commit?access_token=$GithubToken" \
         -H Content-Type:application/json \
         -X POST \
