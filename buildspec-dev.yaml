@@ -19,11 +19,9 @@ phases:
       - export CLEAN_PR=$(echo $CODEBUILD_SOURCE_VERSION | tr '/' '-')
       - export PR_BRANCH_NAME="${SITE_BUCKET_PREFIX}-${CLEAN_PR}"
       - echo $PR_BRANCH_NAME
-      - npm run test
-      - npm run build
-
-     
-
+      - $TAG "Unit Tests" "npm run test:unit"
   build:
     commands:     
-     - npm run build
+     - $TAG "Build App" "npm run build"
+     - $TAG "Clean Pr Bucket" "./tools/build/prepare-pr-bucket.sh"
+     - $TAG "Sync to S3" "aws s3 sync build s3://$SITE_BUCKET_NAME"
