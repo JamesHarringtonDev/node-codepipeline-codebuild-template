@@ -57,12 +57,7 @@ Resources:
     Type: 'AWS::S3::Bucket'
     Condition: IsStaging
     Properties:
-      BucketName: 
-        'Fn::Transform':
-          - Name: 'String'
-            Parameters:
-              InputString: !Sub arn:aws:s3:::${GitHubOwner}-${GitHubRepo}-stg
-              Operation: Lower
+      BucketName: !Sub arn:aws:s3:::${GitHubRepo}-stg
       AccessControl: PublicRead
       WebsiteConfiguration:
         IndexDocument: index.html
@@ -155,13 +150,7 @@ Resources:
         Image: aws/codebuild/standard:4.0
         EnvironmentVariables:
           - Name: SITE_BUCKET_PREFIX
-            Value:
-             'Fn::Transform':
-                - Name: 'String'
-                  Parameters:
-                    InputString: !Sub arn:aws:s3:::${GitHubOwner}-${GitHubRepo}-dev-
-                    Operation: Lower
-                  Type: PLAINTEXT
+            Value: !Sub arn:aws:s3:::${GitHubRepo}-dev-
       Source:
         Auth:
           Type: OAUTH
@@ -241,12 +230,12 @@ Resources:
                 Action:
                 - s3:ListBucket
                 Resource:
-                - !Sub arn:aws:s3:::arn:aws:s3:::${GitHubOwner}-${GitHubRepo}-dev-pr-*
+                - !Sub arn:aws:s3:::arn:aws:s3:::${GitHubRepo}-dev-pr-*
               - Sid: AllObjectActions
                 Effect: Allow
                 Action: s3:*Object
                 Resource:
-                - !Sub arn:aws:s3:::arn:aws:s3:::${GitHubOwner}-${GitHubRepo}-dev-pr-*/*
+                - !Sub arn:aws:s3:::arn:aws:s3:::${GitHubRepo}-dev-pr-*/*
               - Effect: Allow
                 Resource:
                 - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*'
