@@ -19,6 +19,14 @@ commit=`git rev-parse HEAD`
 context=$1
 command=$2
 
+echo `hub api "https://api.github.com/repos/$GitHubOwner/$GitHubRepo/statuses/$commit?access_token=$GITHUB_TOKEN" \
+        -H Content-Type:application/json \
+        -X POST \
+        -f state="$1" \
+        -f description="$2" \
+        -f context="$context" \
+        -f target_url="https://$AWS_REGION.console.aws.amazon.com/codebuild/home?region=$AWS_REGION#/builds/$CODEBUILD_BUILD_ID/view/new"`
+
 
 function create_commit_status() {
     result=`hub api "https://api.github.com/repos/$GitHubOwner/$GitHubRepo/statuses/$commit?access_token=$GITHUB_TOKEN" \
