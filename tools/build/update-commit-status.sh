@@ -19,7 +19,7 @@ commit=`git rev-parse HEAD`
 context=$1
 command=$2
 
-echo `hub api "https://api.github.com/repos/$GitHubOwner/$GitHubRepo/statuses/$commit?access_token=$GITHUB_TOKEN" \
+echo `hub api "https://api.github.com/repos/$GitHubOwner/$GitHubRepo/statuses/$commit?access_token=$GithubToken" \
         -H Content-Type:application/json \
         -X POST \
         -f state="$1" \
@@ -29,7 +29,7 @@ echo `hub api "https://api.github.com/repos/$GitHubOwner/$GitHubRepo/statuses/$c
 
 
 function create_commit_status() {
-    result=`hub api "https://api.github.com/repos/$GitHubOwner/$GitHubRepo/statuses/$commit?access_token=$GITHUB_TOKEN" \
+    result=`hub api "https://api.github.com/repos/$GitHubOwner/$GitHubRepo/statuses/$commit?access_token=$GithubToken" \
         -H Content-Type:application/json \
         -X POST \
         -f state="$1" \
