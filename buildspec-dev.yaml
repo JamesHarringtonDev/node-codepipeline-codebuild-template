@@ -1,5 +1,11 @@
 version: 0.2
 
+env:
+  parameter-store:
+    GITHUB_OWNER:             "/python-serverless-template/build/GITHUB_OWNER"
+    GITHUB_REPO:              "/python-serverless-template/build/GITHUB_REPO"
+    GITHUB_TOKEN:             "/python-serverless-template/build/GITHUB_TOKEN"
+
 phases:
   install:
     runtime-versions:
