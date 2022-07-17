@@ -1,0 +1,29 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 12
+    commands:
+      # Give execute permissions to all build scripts
+      - chmod +x ./tools/build/*.sh
+      # Set an alias to the update-commit-status, which creates commit statuses in GitHub
+      - TAG="./tools/build/update-commit-status.sh"
+      # Install Hub CLI for GitHub
+      - ./tools/build/hub-installer.sh && PATH=$PATH:/opt/tools/hub/bin
+      # Installing 
+      - npm install
+  pre_build:
+    commands:   
+      # Get the Pull Request number from GitHub as pr-#
+      - export CLEAN_PR=$(echo $CODEBUILD_SOURCE_VERSION | tr '/' '-')
+      - export PR_BRANCH_NAME="${SITE_BUCKET_PREFIX}-${CLEAN_PR}"
+      - echo $PR_BRANCH_NAME
+      - npm run test
+      - npm run build
+
+     
+
+  build:
+    commands:     
+     - npm run build
