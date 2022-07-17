@@ -19,8 +19,8 @@ commit=`git rev-parse HEAD`
 context=$1
 command=$2
 
-echo `context = $context`
-echo `command = $command`
+echo "context=$context"
+echo "command=$command"
 
 
  function create_commit_status() {
