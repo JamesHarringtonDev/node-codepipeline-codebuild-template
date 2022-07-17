@@ -19,16 +19,11 @@ commit=`git rev-parse HEAD`
 context=$1
 command=$2
 
-echo `hub api "https://api.github.com/repos/$GitHubOwner/$GitHubRepo/statuses/$commit?access_token=$GithubToken" \
-        -H Content-Type:application/json \
-        -X POST \
-        -f state="$1" \
-        -f description="$2" \
-        -f context="$context" \
-        -f target_url="https://$AWS_REGION.console.aws.amazon.com/codebuild/home?region=$AWS_REGION#/builds/$CODEBUILD_BUILD_ID/view/new"`
+echo `context = $context`
+echo `command = $command`
 
 
-function create_commit_status() {
+ function create_commit_status() {
     result=`hub api "https://api.github.com/repos/$GitHubOwner/$GitHubRepo/statuses/$commit?access_token=$GithubToken" \
         -H Content-Type:application/json \
         -X POST \
@@ -36,7 +31,9 @@ function create_commit_status() {
         -f description="$2" \
         -f context="$context" \
         -f target_url="https://$AWS_REGION.console.aws.amazon.com/codebuild/home?region=$AWS_REGION#/builds/$CODEBUILD_BUILD_ID/view/new"`
-}
+
+  echo $result
+} 
 
 # Create a Pending commit status
 create_commit_status "pending" "job starting"
