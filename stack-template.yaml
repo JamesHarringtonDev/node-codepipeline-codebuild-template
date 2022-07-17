@@ -218,7 +218,7 @@ Resources:
                     - codebuild.amazonaws.com
               Action:
                 - sts:AssumeRole
-      Description: !Sub "IAM Role for ${AWS::StackName}"
+      Description: !Sub "IAM Role for ${AWS::StackName}, Dev"
       Path: '/'
       Policies:
         - PolicyName: root
@@ -243,6 +243,9 @@ Resources:
                 - 'logs:CreateLogGroup'
                 - 'logs:CreateLogStream'
                 - 'logs:PutLogEvents'
+              - Effect: Allow
+                Action: ssm:GetParameters
+                Resource: "*"
 Outputs:
   StagingWebsiteURL:
     Condition: IsStaging
