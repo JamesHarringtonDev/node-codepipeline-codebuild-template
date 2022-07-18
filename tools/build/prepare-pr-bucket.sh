@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 bucketResponse=$(aws s3 ls "s3://$PR_BRANCH_NAME") 
      
 if [ ($bucketResponse | grep 'AccessDenied' &> /dev/null) == 0 ] 
@@ -14,7 +16,7 @@ fi
 
 
 
-if [ $bucketResponse | grep 'NoSuchBucket' &> /dev/null) == 0 ] 
+if [ ($bucketResponse | grep 'NoSuchBucket' &> /dev/null) == 0 ] 
 then
     echo "$PR_BRANCH_NAME doesn\'t exist please check again"
     exit
