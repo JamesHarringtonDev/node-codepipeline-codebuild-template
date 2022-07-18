@@ -225,15 +225,10 @@ Resources:
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
-              - Sid: AllObjectActions
-                Effect: Allow
+              - Effect: Allow
                 Action: s3:*
                 Resource:
                 - !Sub arn:aws:s3:::arn:aws:s3:::${GitHubRepo}-dev-pr-*/*
-              - Sid: AllBucketActions
-                Effect: Allow
-                Action: s3:*
-                Resource:
                 - !Sub arn:aws:s3:::arn:aws:s3:::${GitHubRepo}-dev-pr-*
               - Effect: Allow
                 Resource:
