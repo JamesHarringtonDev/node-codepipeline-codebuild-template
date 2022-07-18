@@ -150,7 +150,7 @@ Resources:
         Image: aws/codebuild/standard:4.0
         EnvironmentVariables:
           - Name: SITE_BUCKET_PREFIX
-            Value: !Sub arn:aws:s3:::${GitHubRepo}-dev-
+            Value: !Sub ${GitHubRepo}-dev
       Source:
         Auth:
           Type: OAUTH
