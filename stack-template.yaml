@@ -225,17 +225,16 @@ Resources:
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
-              - Sid: ListObjectsInBucket
-                Effect: Allow
-                Action:
-                - s3:ListBucket
-                Resource:
-                - !Sub arn:aws:s3:::arn:aws:s3:::${GitHubRepo}-dev-pr-*
               - Sid: AllObjectActions
                 Effect: Allow
-                Action: s3:*Object
+                Action: s3:*
                 Resource:
                 - !Sub arn:aws:s3:::arn:aws:s3:::${GitHubRepo}-dev-pr-*/*
+              - Sid: AllBucketActions
+                Effect: Allow
+                Action: s3:*
+                Resource:
+                - !Sub arn:aws:s3:::arn:aws:s3:::${GitHubRepo}-dev-pr-*
               - Effect: Allow
                 Resource:
                 - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*'
