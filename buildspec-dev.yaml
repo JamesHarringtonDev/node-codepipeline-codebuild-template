@@ -31,4 +31,4 @@ phases:
     commands:     
      - $TAG "Build App" "npm run build"
      - $TAG "Clean Pr Bucket" "./tools/build/prepare-pr-bucket.sh"
-     - $TAG "Sync to S3" "aws s3 sync build s3://$SITE_BUCKET_NAME"
+     - $TAG "Sync to S3" "aws s3 sync build s3://$PR_BRANCH_NAME"
