@@ -228,8 +228,9 @@ Resources:
               - Effect: Allow
                 Action: s3:*
                 Resource:
-                - !Sub arn:aws:s3:::arn:aws:s3:::${GitHubRepo}-dev-pr-*/*
-                - !Sub arn:aws:s3:::arn:aws:s3:::${GitHubRepo}-dev-pr-*
+                # - !Sub arn:aws:s3:::arn:aws:s3:::${GitHubRepo}-dev-pr-*/*
+                # - !Sub arn:aws:s3:::arn:aws:s3:::${GitHubRepo}-dev-pr-*
+                - '*'
               - Effect: Allow
                 Resource:
                 - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*'
