@@ -23,6 +23,7 @@ phases:
     commands:   
       # Get the Pull Request number from GitHub as pr-#
       - export CLEAN_PR=$(echo $CODEBUILD_SOURCE_VERSION | tr '/' '-')
+      
       - export PR_BRANCH_NAME="${SITE_BUCKET_PREFIX}-${CLEAN_PR}"
       - echo $PR_BRANCH_NAME
       - $TAG "Unit Tests" "npm run test:unit"
