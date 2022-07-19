@@ -10,11 +10,14 @@
 #   aws s3 mb s3://$PR_BRANCH_NAME 
 # fi
 
-bucketstatus=$(aws s3api head-bucket --bucket "s3://$PR_BRANCH_NAME" 2>&1)
+bucketstatus=$(aws s3api head-bucket --bucket "$PR_BRANCH_NAME" 2>&1)
 if echo "${bucketstatus}" | grep 'Not Found';
 then
   echo "Creating $PR_BRANCH_NAME"
-  aws s3 mb s3://$PR_BRANCH_NAME 
+  echo "aws s3 create-bucket --bucket $PR_BRANCH_NAME --region $AWS_REGION"
+  aws s3 mb s3://$PR_BRANCH_NAME
+  aws s3 website s3://$PR_BRANCH_NAME  --index-document index.html-document --error index.html
+
 elif echo "${bucketstatus}" | grep 'Forbidden';
 then
   echo "$PR_BRANCH_NAME exists but but we do not have access to"
@@ -25,6 +28,3 @@ else
   echo "Emptying contents of bucket: s3://$PR_BRANCH_NAME"
   aws s3 rm s3://$PR_BRANCH_NAME --recursive
 fi
-
-
-# s3://node-codepipeline-codebuild-template-dev-pr-10
