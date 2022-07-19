@@ -21,6 +21,17 @@ Parameters:
   GitHubRepo:
     Description: Repo to clone, for example node-codepipeline-codebuild-template
     Type: String
+  DeploymentEnvironment:
+    Description: The service environment (production / staging / development)
+    Type: String
+    AllowedValues:
+      - stg
+      - dev
+
+Conditions:
+  IsStaging: !Equals [ !Ref DeploymentEnvironment, stg ]
+  IsDev: !Equals [ !Ref DeploymentEnvironment,  dev ]
+
 
 Resources:
   GitHubOwnerParameter:
@@ -44,7 +55,9 @@ Resources:
 
   StagingSiteBucket:
     Type: 'AWS::S3::Bucket'
+    Condition: IsStaging
     Properties:
+      BucketName: !Sub arn:aws:s3:::${GitHubRepo}-stg
       AccessControl: PublicRead
       WebsiteConfiguration:
         IndexDocument: index.html
@@ -54,6 +67,7 @@ Resources:
 
   StagingSitePolicy:
     Type: 'AWS::S3::BucketPolicy'
+    Condition: IsStaging
     Properties:
       PolicyDocument:
         Id: MyPolicy
@@ -79,6 +93,7 @@ Resources:
 
   StgCodeBuildProject:
     Type: AWS::CodeBuild::Project
+    Condition: IsStaging
     Properties:
       Description: CodeBuild with GitHub webhook for Staging Project
       Triggers:
@@ -107,14 +122,52 @@ Resources:
         Location: !Ref GitHubUrl
         BuildSpec: buildspec-stg.yaml
       TimeoutInMinutes: 10
-  
+
   StagingCodeBuildLogGroup:
+    Condition: IsStaging
     Type: AWS::Logs::LogGroup
     Properties:
       LogGroupName: !Sub "/aws/codebuild/${StgCodeBuildProject}"
       RetentionInDays: 7 
+
+  DevCodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Condition: IsDev
+    Properties:
+      Description: CodeBuild with GitHub webhook for Dev Project
+      Triggers:
+        BuildType: BUILD
+        Webhook: True
+        FilterGroups:
+          - - Type: EVENT
+              Pattern: PULL_REQUEST_CREATED,PULL_REQUEST_UPDATED,PULL_REQUEST_REOPENED
+      ServiceRole: !GetAtt DevCodebuildRole.Arn
+      Artifacts:
+        Type: NO_ARTIFACTS
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:4.0
+        EnvironmentVariables:
+          - Name: SITE_BUCKET_PREFIX
+            Value: !Sub ${GitHubRepo}-dev
+      Source:
+        Auth:
+          Type: OAUTH
+        Type: GITHUB
+        Location: !Ref GitHubUrl
+        BuildSpec: buildspec-dev.yaml
+      TimeoutInMinutes: 10
+
+  DevCodeBuildLogGroup:
+    Condition: IsStaging
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/codebuild/${DevCodeBuildProject}"
+      RetentionInDays: 7 
   
   StagingCodebuildRole:
+    Condition: IsStaging
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -151,8 +204,46 @@ Resources:
                 - 'logs:CreateLogGroup'
                 - 'logs:CreateLogStream'
                 - 'logs:PutLogEvents'
+
+  DevCodebuildRole:
+    Condition: IsDev
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+            - Effect: Allow
+              Principal:
+                  Service:
+                    - codebuild.amazonaws.com
+              Action:
+                - sts:AssumeRole
+      Description: !Sub "IAM Role for ${AWS::StackName}, Dev"
+      Path: '/'
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: s3:*
+                Resource:
+                # - !Sub arn:aws:s3:::arn:aws:s3:::${GitHubRepo}-dev-pr-*/*
+                # - !Sub arn:aws:s3:::arn:aws:s3:::${GitHubRepo}-dev-pr-*
+                - '*'
+              - Effect: Allow
+                Resource:
+                - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*'
+                Action:
+                - 'logs:CreateLogGroup'
+                - 'logs:CreateLogStream'
+                - 'logs:PutLogEvents'
+              - Effect: Allow
+                Action: ssm:GetParameters
+                Resource: "*"
 Outputs:
-  WebsiteURL:
+  StagingWebsiteURL:
+    Condition: IsStaging
     Value: !GetAtt 
       - StagingSiteBucket
       - WebsiteURL

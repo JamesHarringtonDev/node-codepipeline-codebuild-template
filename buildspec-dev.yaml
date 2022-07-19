@@ -1,0 +1,34 @@
+version: 0.2
+
+env:
+  parameter-store:
+    GITHUB_OWNER:             "/node-codepipeline-codebuild-template/build/GITHUB_OWNER"
+    GITHUB_REPO:              "/node-codepipeline-codebuild-template/build/GITHUB_REPO"
+    GITHUB_TOKEN:             "/node-codepipeline-codebuild-template/build/GITHUB_TOKEN"
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 12
+    commands:
+      # Give execute permissions to all build scripts
+      - chmod +x ./tools/build/*.sh
+      # Set an alias to the update-commit-status, which creates commit statuses in GitHub
+      - TAG="./tools/build/update-commit-status.sh"
+      # Install Hub CLI for GitHub
+      - ./tools/build/hub-installer.sh && PATH=$PATH:/opt/tools/hub/bin
+      # Installing 
+      - npm install
+  pre_build:
+    commands:   
+      # Get the Pull Request number from GitHub as pr-#
+      - export CLEAN_PR=$(echo $CODEBUILD_SOURCE_VERSION | tr '/' '-')
+      
+      - export PR_BRANCH_NAME="${SITE_BUCKET_PREFIX}-${CLEAN_PR}"
+      - echo $PR_BRANCH_NAME
+      - $TAG "Unit Tests" "npm run test:unit"
+  build:
+    commands:     
+     - $TAG "Build App" "npm run build"
+     - $TAG "Clean Pr Bucket" "./tools/build/prepare-pr-bucket.sh"
+     - $TAG "Sync to S3" "aws s3 sync build s3://$PR_BRANCH_NAME"
